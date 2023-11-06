@@ -1,0 +1,23 @@
+[package]
+name = "Fullerene"
+version = "0.1.0" # change with html_root_url in lib.rs
+edition = "2021"
+authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
+
+description = "Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust"
+keywords = ["kinetics", "dynamics", "3d", "physics", "polyhedron"]
+categories = ["simulation", "rendering", "science"]
+license = "MIT"
+
+documentation = "https://docs.rs/Fullerene/"
+homepage = "https://crates.io/crates/Fullerene"
+repository = "https://github.com/nomissbowling/Fullerene"
+
+readme = "README.md"
+
+#build = "build.rs"
+
+[lib]
+name = "fullerene"
+
+[dependencies]
