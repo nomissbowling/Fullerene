@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.2")]
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.3")]
 //! Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust
 //!
 
@@ -48,10 +48,18 @@ pub fn divide_ext<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
 /// trait TUV
 pub trait TUV<F: Float> {
   /// get uv from each face (i: vertex id of npolygon)
-  fn get_uv_f(&self, i: usize, n: usize) -> [F; 2] {
-    let t = 2.0 * std::f64::consts::PI * i as f64 / n as f64;
-    let uv = [(1.0 + t.cos()) / 2.0, 1.0 - (1.0 + t.sin()) / 2.0];
-    [<F>::from(uv[0]).unwrap(), <F>::from(uv[1]).unwrap()]
+  fn get_uv_f(&self, n: usize, i: usize, k: usize, c: bool) -> [F; 2] {
+    if c && k == 0 { // center [0]
+      [<F>::from(0.5).unwrap(), <F>::from(0.5).unwrap()]
+    } else {
+      let (m, j) = match c {
+      true => (n, (i + k - 1) % n + 1), // j: 0(12) 0(23) 0(34) 0(45) 0(51)
+      false => (n + 2, if k == 0 { 0 } else { i + k }) // j: 0(12) 0(23) 0(34)
+      };
+      let t = 2.0 * std::f64::consts::PI * j as f64 / m as f64;
+      let uv = [(1.0 + t.cos()) / 2.0, 1.0 - (1.0 + t.sin()) / 2.0];
+      [<F>::from(uv[0]).unwrap(), <F>::from(uv[1]).unwrap()]
+    }
   }
   /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
   fn get_uv_t(&self, f: usize, v: usize, i: usize) -> [F; 2];
