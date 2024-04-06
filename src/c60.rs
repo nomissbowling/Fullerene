@@ -25,8 +25,9 @@ pub struct C60<F: Float> {
 /// impl trait TUV for C60
 impl<F: Float> TUV<F> for C60<F> {
   /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
-    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
+    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
+    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
   }
   /// ref vtx
   fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
@@ -109,8 +110,9 @@ pub struct C60Center<F: Float> {
 /// impl trait TUV for C60Center
 impl<F: Float> TUV<F> for C60Center<F> {
   /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
-    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
+    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
+    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
   }
   /// ref vtx
   fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
