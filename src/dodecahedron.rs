@@ -8,7 +8,7 @@
 
 use num::Float;
 
-use crate::{center_indexed, divide_int};
+use crate::{TUV, center_indexed, divide_int};
 use crate::icosahedron::Icosahedron;
 
 /// Dodecahedron
@@ -22,13 +22,25 @@ pub struct Dodecahedron<F: Float> {
   pub tri: Vec<Vec<[u8; 3]>>
 }
 
+/// impl trait TUV for Dodecahedron
+impl<F: Float> TUV<F> for Dodecahedron<F> {
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
+    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  }
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
+}
+
 /// Dodecahedron
 impl<F: Float> Dodecahedron<F> {
   /// construct
   pub fn new(r: F) -> Self {
     let icosa = Icosahedron::<F>::new(r);
-    let vtx: Vec<_> = icosa.tri.iter().map(|&t|
-      center_indexed(&t, &icosa.vtx)).collect(); // 0-19
+    let vtx: Vec<_> = icosa.tri.iter().map(|t|
+      center_indexed(&t[0], &icosa.vtx)).collect(); // 0-19
     let edges = vec![];
     let tri = vec![
   vec![[0, 4, 3], [0, 3, 2], [0, 2, 1]], // 0 [0, [4, 3, 2, 1]]
@@ -57,6 +69,18 @@ pub struct DodecahedronCenter<F: Float> {
   pub edges: Vec<(u8, [u8; 3])>,
   /// tri: Vec 12 of Vec 5 indexed triangles
   pub tri: Vec<Vec<[u8; 3]>>
+}
+
+/// impl trait TUV for DodecahedronCenter
+impl<F: Float> TUV<F> for DodecahedronCenter<F> {
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
+    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  }
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
 }
 
 /// Dodecahedron with center

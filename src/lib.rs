@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.1")]
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.2")]
 //! Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust
 //!
 
@@ -43,6 +43,22 @@ pub fn divide_int<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
 /// divide externally
 pub fn divide_ext<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
   divide_int(p, q, m, -n)
+}
+
+/// trait TUV
+pub trait TUV<F: Float> {
+  /// get uv from each face (i: vertex id of npolygon)
+  fn get_uv_f(&self, i: usize, n: usize) -> [F; 2] {
+    let t = 2.0 * std::f64::consts::PI * i as f64 / n as f64;
+    let uv = [(1.0 + t.cos()) / 2.0, 1.0 - (1.0 + t.sin()) / 2.0];
+    [<F>::from(uv[0]).unwrap(), <F>::from(uv[1]).unwrap()]
+  }
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, f: usize, v: usize, i: usize) -> [F; 2];
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]>;
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>>;
 }
 
 /// tests

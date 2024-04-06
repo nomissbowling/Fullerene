@@ -8,7 +8,7 @@
 
 use num::Float;
 
-use crate::{center_indexed, divide_int};
+use crate::{TUV, center_indexed, divide_int};
 use crate::icosahedron::Icosahedron;
 
 /// C60
@@ -20,6 +20,18 @@ pub struct C60<F: Float> {
   pub edges: Vec<(u8, [u8; 3])>,
   /// tri: (Vec 12 of Vec 3) or (Vec 20 of Vec 4) indexed triangles
   pub tri: Vec<Vec<[u8; 3]>>
+}
+
+/// impl trait TUV for C60
+impl<F: Float> TUV<F> for C60<F> {
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
+    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  }
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
 }
 
 /// C60
@@ -94,6 +106,18 @@ pub struct C60Center<F: Float> {
   pub tri: Vec<Vec<[u8; 3]>>
 }
 
+/// impl trait TUV for C60Center
+impl<F: Float> TUV<F> for C60Center<F> {
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
+    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  }
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
+}
+
 /// C60 with center
 impl<F: Float> C60Center<F> {
   /// construct
@@ -105,7 +129,7 @@ impl<F: Float> C60Center<F> {
     let mut vtx: Vec<_> = cv.iter().map(|&p| p).collect(); // 0-59
     vtx.extend(icosa.edges.iter().map(|&(e, is)|
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 1, 2))); // 60-71
-    vtx.extend(icosa.tri.iter().map(|&t| center_indexed(&t, iv))); // 72-91
+    vtx.extend(icosa.tri.iter().map(|t| center_indexed(&t[0], iv))); // 72-91
     let edges = vec![];
     let mut tri: Vec<_> = (60..72).into_iter().map(|q: u8| {
       let mut t = Vec::with_capacity(5); // vec![[0u8; 3]; 5];

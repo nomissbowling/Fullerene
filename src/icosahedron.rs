@@ -9,6 +9,8 @@
 // use num::{Float, zero, one};
 use num::Float;
 
+use crate::TUV;
+
 /// Icosahedron
 #[derive(Debug)]
 pub struct Icosahedron<F: Float> {
@@ -16,8 +18,20 @@ pub struct Icosahedron<F: Float> {
   pub vtx: Vec<[F; 3]>,
   /// edges (duplex)
   pub edges: Vec<(u8, [u8; 5])>,
-  /// tri: Vec 20 indexed triangles
-  pub tri: Vec<[u8; 3]>
+  /// tri: Vec 20 of Vec 1 indexed triangles
+  pub tri: Vec<Vec<[u8; 3]>>
+}
+
+/// impl trait TUV for Icosahedron
+impl<F: Float> TUV<F> for Icosahedron<F> {
+  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
+  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize) -> [F; 2] {
+    [<F>::from(0.0).unwrap(), <F>::from(0.0).unwrap()]
+  }
+  /// ref vtx
+  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
+  /// ref tri
+  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
 }
 
 /// Icosahedron
@@ -65,26 +79,26 @@ impl<F: Float> Icosahedron<F> {
       [2, 3, 6], [6, 7, 10], [10, 11, 2], // double x 3
       [2, 6, 10] // triple x 1
 */
-      [0, 8, 4],
-      [0, 9, 8],
-      [0, 7, 9],
-      [0, 1, 7],
-      [4, 1, 0],
-      [4, 11, 1],
-      [4, 5, 11],
-      [8, 5, 4],
-      [8, 3, 5],
-      [8, 9, 3],
-      [6, 3, 9],
-      [6, 9, 7],
-      [6, 7, 10],
-      [10, 7, 1],
-      [10, 1, 11],
-      [10, 11, 2],
-      [2, 11, 5],
-      [2, 5, 3],
-      [2, 3, 6],
-      [2, 6, 10]
+      vec![[0, 8, 4]],
+      vec![[0, 9, 8]],
+      vec![[0, 7, 9]],
+      vec![[0, 1, 7]],
+      vec![[4, 1, 0]],
+      vec![[4, 11, 1]],
+      vec![[4, 5, 11]],
+      vec![[8, 5, 4]],
+      vec![[8, 3, 5]],
+      vec![[8, 9, 3]],
+      vec![[6, 3, 9]],
+      vec![[6, 9, 7]],
+      vec![[6, 7, 10]],
+      vec![[10, 7, 1]],
+      vec![[10, 1, 11]],
+      vec![[10, 11, 2]],
+      vec![[2, 11, 5]],
+      vec![[2, 5, 3]],
+      vec![[2, 3, 6]],
+      vec![[2, 6, 10]]
     ]
     }
   }
