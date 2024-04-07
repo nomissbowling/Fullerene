@@ -8,7 +8,7 @@
 
 use num::Float;
 
-use crate::{TUV, center_indexed, divide_int};
+use crate::{PHF, TUV, center_indexed, divide_int};
 use crate::icosahedron::Icosahedron;
 
 /// C60
@@ -33,6 +33,8 @@ impl<F: Float> TUV<F> for C60<F> {
   fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
   /// ref tri
   fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
+  /// with_uv
+  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, false) }
 }
 
 /// C60
@@ -118,6 +120,8 @@ impl<F: Float> TUV<F> for C60Center<F> {
   fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
   /// ref tri
   fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
+  /// with_uv
+  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, true) }
 }
 
 /// C60 with center

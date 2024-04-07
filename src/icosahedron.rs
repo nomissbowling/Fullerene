@@ -9,7 +9,7 @@
 // use num::{Float, zero, one};
 use num::Float;
 
-use crate::TUV;
+use crate::{PHF, TUV};
 
 /// Icosahedron
 #[derive(Debug)]
@@ -33,6 +33,8 @@ impl<F: Float> TUV<F> for Icosahedron<F> {
   fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
   /// ref tri
   fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
+  /// with_uv
+  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, false) }
 }
 
 /// Icosahedron

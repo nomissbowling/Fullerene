@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.4")]
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.5")]
 //! Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust
 //!
 
@@ -45,6 +45,19 @@ pub fn divide_ext<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
   divide_int(p, q, m, -n)
 }
 
+/// f_to_f32
+pub fn f_to_f32<F: Float>(v: &[F]) -> Vec<f32> {
+  v.iter().map(|i| i.to_f32().unwrap()).collect()
+}
+
+/// f_to_f64
+pub fn f_to_f64<F: Float>(v: &[F]) -> Vec<f64> {
+  v.iter().map(|i| i.to_f64().unwrap()).collect()
+}
+
+/// PHF polyhedron face
+pub type PHF<F> = Vec<Vec<Vec<([F; 3], [F; 2])>>>;
+
 /// trait TUV
 pub trait TUV<F: Float> {
   /// get uv from each face (i: vertex id of npolygon)
@@ -69,6 +82,31 @@ pub trait TUV<F: Float> {
   fn ref_vtx(&self) -> &Vec<[F; 3]>;
   /// ref tri
   fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>>;
+  /// with_uv
+  fn with_uv(&self, tf: bool) -> PHF<F>;
+  /// polyhedron faces by Vec N of Vec P(polygon) indexed triangles
+  fn phf(&self, tf: bool, c: bool) -> PHF<F> {
+    self.ref_tri().iter().enumerate().map(|(fi, f)|
+      f.iter().enumerate().map(|(vi, v)|
+        v.iter().enumerate().map(|(ii, &i)| {
+          self.gen_uv(i as usize, tf, fi, f.len(), vi, ii, c)
+        }).collect()
+      ).collect()
+    ).collect()
+  }
+  /// gen uv
+  fn gen_uv(&self, i: usize, tf: bool,
+    fi: usize, n: usize, vi: usize, ii: usize, c: bool) -> ([F; 3], [F; 2]) {
+    let r = std::f64::consts::PI / 2.0; // rot
+    let s = 1.0f64; // scale
+    let o = [0.0f64, 0.0f64]; // offset
+    let p = self.ref_vtx()[i];
+    let uv = match tf {
+    true => self.get_uv_t(fi, vi, ii, 0.0f64, s, o), // on the one texture
+    false => self.get_uv_f(n, vi, ii, c, r, s, o) // texture each face
+    };
+    (p, uv)
+  }
 }
 
 /// tests
