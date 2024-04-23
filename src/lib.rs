@@ -1,5 +1,5 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.5")]
-//! Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.6")]
+//! Fullerene on the ODE (Open Dynamics Engine) for Rust
 //!
 
 pub mod c60;

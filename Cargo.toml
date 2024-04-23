@@ -1,12 +1,12 @@
 [package]
 name = "Fullerene"
-version = "0.1.5" # change with html_root_url in lib.rs
+version = "0.1.6" # change with html_root_url in lib.rs
 edition = "2021"
 authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
 
-description = "Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust"
+description = "Fullerene on the ODE (Open Dynamics Engine) for Rust"
 keywords = ["kinetics", "dynamics", "3d", "physics", "polyhedron"]
-categories = ["simulation", "rendering", "science"]
+categories = ["simulation", "rendering", "science", "mathematics"]
 license = "MIT"
 
 documentation = "https://docs.rs/Fullerene/"

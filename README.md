@@ -1,17 +1,20 @@
 Fullerene
 =========
 
-Fullerene on the Open Dynamics Engine ( ODE / OYK ) for Rust
+Fullerene on the ODE (Open Dynamics Engine) for Rust
 
 
-- [https://crates.io/crates/Fullerene]( https://crates.io/crates/Fullerene )
+- [https://crates.io/crates/Fullerene](https://crates.io/crates/Fullerene)
+- [https://github.com/nomissbowling/Fullerene](https://github.com/nomissbowling/Fullerene)
 
 
-Requirement
------------
+See also
+--------
 
-- [Open Dynamics Engine (ODE)]( https://ode.org/ )
-- [OYK (ODE bindings for Rust)]( https://crates.io/crates/OYK )
+- [ODE (Open Dynamics Engine)](https://ode.org/)
+- [ode-rs (ODE bindings for Rust)](https://crates.io/crates/ode-rs)
+- [dxlib (DxLib for Rust)](https://crates.io/crates/dxlib)
+- [wgpu-app](https://crates.io/crates/wgpu-app)
 
 
 License
