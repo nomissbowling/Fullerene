@@ -8,40 +8,25 @@
 
 use num::Float;
 
-use crate::{PHF, TUV, center_indexed, divide_int};
+use ph_faces::{Polyhedron, center_indexed, divide_int};
+
 use crate::icosahedron::Icosahedron;
 
 /// Dodecahedron
 #[derive(Debug)]
 pub struct Dodecahedron<F: Float> {
-  /// vtx
-  pub vtx: Vec<[F; 3]>,
+  /// polyhedron tri: Vec 12 of Vec 3 indexed triangles
+  pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>,
-  /// tri: Vec 12 of Vec 3 indexed triangles
-  pub tri: Vec<Vec<[u8; 3]>>
-}
-
-/// impl trait TUV for Dodecahedron
-impl<F: Float> TUV<F> for Dodecahedron<F> {
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
-    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
-  }
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, false) }
+  pub edges: Vec<(u8, [u8; 3])>
 }
 
 /// Dodecahedron
 impl<F: Float> Dodecahedron<F> {
   /// construct
   pub fn new(r: F) -> Self {
-    let icosa = Icosahedron::<F>::new(r);
+    let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
+    let icosa = icosa_e.ph;
     let vtx: Vec<_> = icosa.tri.iter().map(|t|
       center_indexed(&t[0], &icosa.vtx)).collect(); // 0-19
     let edges = vec![];
@@ -59,51 +44,37 @@ impl<F: Float> Dodecahedron<F> {
   vec![[19, 12, 13], [19, 13, 14], [19, 14, 15]], // 10 [19, [12, 13, 14, 15]]
   vec![[19, 15, 16], [19, 16, 17], [19, 17, 18]] // 2 [19, [15, 16, 17, 18]]
     ];
-    Dodecahedron{vtx, edges, tri}
+    Dodecahedron{ph: Polyhedron{vtx, tri}, edges}
   }
 }
 
 /// Dodecahedron with center
 #[derive(Debug)]
 pub struct DodecahedronCenter<F: Float> {
-  /// vtx
-  pub vtx: Vec<[F; 3]>,
+  /// polyhedron tri: Vec 12 of Vec 5 indexed triangles
+  pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>,
-  /// tri: Vec 12 of Vec 5 indexed triangles
-  pub tri: Vec<Vec<[u8; 3]>>
-}
-
-/// impl trait TUV for DodecahedronCenter
-impl<F: Float> TUV<F> for DodecahedronCenter<F> {
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
-    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
-  }
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, true) }
+  pub edges: Vec<(u8, [u8; 3])>
 }
 
 /// Dodecahedron with center
 impl<F: Float> DodecahedronCenter<F> {
   /// construct
   pub fn new(r: F) -> Self {
-    let icosa = Icosahedron::<F>::new(r);
+    let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
+    let icosa = icosa_e.ph;
     let iv = &icosa.vtx;
 /*
-    let mut vtx: Vec<_> = icosa.edges.iter().map(|&(e, is)|
+    let mut vtx: Vec<_> = icosa_e.edges.iter().map(|&(e, is)|
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 2, 1)).collect();
-    let dodeca = Dodecahedron::<F>::new();
+    let dodeca_e = Dodecahedron::<F>::new(); // to keep lifetime
+    let dodeca = dodeca_e.ph;
     vtx.extend(dodeca.vtx.iter().map(|&p| p));
 */
-    let dodeca = Dodecahedron::<F>::new(r);
+    let dodeca_e = Dodecahedron::<F>::new(r); // to keep lifetime
+    let dodeca = dodeca_e.ph;
     let mut vtx: Vec<_> = dodeca.vtx.iter().map(|&p| p).collect(); // 0-19
-    vtx.extend(icosa.edges.iter().map(|&(e, is)|
+    vtx.extend(icosa_e.edges.iter().map(|&(e, is)|
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 2, 1))); // 20-31
     let edges = vec![];
     let tri: Vec<_> = (20..32).into_iter().map(|q: u8| {
@@ -129,6 +100,6 @@ impl<F: Float> DodecahedronCenter<F> {
     }).collect();
 */
     // println!("{:?}", tri);
-    DodecahedronCenter{vtx, edges, tri}
+    DodecahedronCenter{ph: Polyhedron{vtx, tri}, edges}
   }
 }

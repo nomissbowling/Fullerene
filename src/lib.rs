@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.1.6")]
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.2.1")]
 //! Fullerene on the ODE (Open Dynamics Engine) for Rust
 //!
 
@@ -10,104 +10,7 @@ pub use c60::{C60, C60Center};
 pub use dodecahedron::{Dodecahedron, DodecahedronCenter};
 pub use icosahedron::Icosahedron;
 
-use num::Float;
-
-/// sum of vec [F; 3] without trait Sum
-/// when use += need trait Float + std::ops::AddAssign &lt; [F; 3] &gt;
-pub fn sum_f3<F: Float>(vs: &Vec<[F; 3]>) -> Vec<F> {
-  vs.iter().fold(vec![<F>::from(0).unwrap(); 3], |s, p|
-    s.iter().zip(p.iter()).map(|(&q, &p)| q + p).collect())
-}
-
-/// avg of vec [F; 3]
-pub fn avg_f3<F: Float>(vs: &Vec<[F; 3]>) -> Vec<F> {
-  let n = <F>::from(vs.len()).unwrap();
-  sum_f3(vs).iter().map(|&v| v / n).collect()
-}
-
-/// center indexed
-pub fn center_indexed<F: Float>(idx: &[u8], vtx: &Vec<[F; 3]>) -> [F; 3] {
-  let p = avg_f3(&idx.iter().map(|&i| vtx[i as usize]).collect());
-  p.as_slice().try_into().unwrap()
-}
-
-/// divide internally
-pub fn divide_int<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
-  let mf = <F>::from(m).unwrap();
-  let nf = <F>::from(n).unwrap();
-  let sf = mf + nf;
-  p.iter().zip(q.iter()).map(|(&a, &b)|
-    (nf * a + mf * b) / sf).collect::<Vec<_>>().as_slice().try_into().unwrap()
-}
-
-/// divide externally
-pub fn divide_ext<F: Float>(p: &[F; 3], q: &[F; 3], m: i32, n: i32) -> [F; 3] {
-  divide_int(p, q, m, -n)
-}
-
-/// f_to_f32
-pub fn f_to_f32<F: Float>(v: &[F]) -> Vec<f32> {
-  v.iter().map(|i| i.to_f32().unwrap()).collect()
-}
-
-/// f_to_f64
-pub fn f_to_f64<F: Float>(v: &[F]) -> Vec<f64> {
-  v.iter().map(|i| i.to_f64().unwrap()).collect()
-}
-
-/// PHF polyhedron face
-pub type PHF<F> = Vec<Vec<Vec<([F; 3], [F; 2])>>>;
-
-/// trait TUV
-pub trait TUV<F: Float> {
-  /// get uv from each face (i: vertex id of npolygon)
-  fn get_uv_f(&self, n: usize, i: usize, k: usize, c: bool,
-    r: f64, s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    if c && k == 0 { // center [0]
-      [<F>::from(o[0] + 0.5).unwrap(), <F>::from(o[1] + 0.5).unwrap()]
-    } else {
-      let (m, j) = match c {
-      true => (n, (i + k - 1) % n), // j: c(01) c(12) c(23) c(34) c(40)
-      false => (n + 2, if k == 0 { 0 } else { i + k }) // j: 0(12) 0(23) 0(34)
-      };
-      let t = 2.0 * std::f64::consts::PI * j as f64 / m as f64 + r;
-      let uv = [(1.0 + s * t.cos()) / 2.0, 1.0 - (1.0 + s * t.sin()) / 2.0];
-      [<F>::from(o[0] + uv[0]).unwrap(), <F>::from(o[1] + uv[1]).unwrap()]
-    }
-  }
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, f: usize, v: usize, i: usize,
-    r: f64, s: f64, o: [f64; 2]) -> [F; 2]; // rot scale offset
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]>;
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>>;
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F>;
-  /// polyhedron faces by Vec N of Vec P(polygon) indexed triangles
-  fn phf(&self, tf: bool, c: bool) -> PHF<F> {
-    self.ref_tri().iter().enumerate().map(|(fi, f)|
-      f.iter().enumerate().map(|(vi, v)|
-        v.iter().enumerate().map(|(ii, &i)| {
-          self.gen_uv(i as usize, tf, fi, f.len(), vi, ii, c)
-        }).collect()
-      ).collect()
-    ).collect()
-  }
-  /// gen uv
-  fn gen_uv(&self, i: usize, tf: bool,
-    fi: usize, n: usize, vi: usize, ii: usize, c: bool) -> ([F; 3], [F; 2]) {
-    let r = std::f64::consts::PI / 2.0; // rot
-    let s = 1.0f64; // scale
-    let o = [0.0f64, 0.0f64]; // offset
-    let p = self.ref_vtx()[i];
-    let uv = match tf {
-    true => self.get_uv_t(fi, vi, ii, 0.0f64, s, o), // on the one texture
-    false => self.get_uv_f(n, vi, ii, c, r, s, o) // texture each face
-    };
-    (p, uv)
-  }
-}
+pub use ph_faces::{self, f_to_f32, f_to_f64, polyhedron::{self, PHF, TUV}};
 
 /// tests
 #[cfg(test)]
@@ -117,14 +20,16 @@ mod tests {
   /// [-- --nocapture] [-- --show-output]
   #[test]
   fn test_icosahedron() {
-    let icosa32 = Icosahedron::new(1.0f32);
+    let icosa32_e = Icosahedron::new(1.0f32);
+    let icosa32 = icosa32_e.ph;
     assert_eq!(icosa32.tri.len(), 20);
     assert_eq!(icosa32.vtx.len(), 12);
     let s32 = format!("{:?}", icosa32.vtx[0]);
     println!("{}", s32);
     assert_eq!(s32, "[0.0, -1.0, -1.618034]");
 
-    let icosa64 = Icosahedron::new(1.0f64);
+    let icosa64_e = Icosahedron::new(1.0f64);
+    let icosa64 = icosa64_e.ph;
     assert_eq!(icosa64.tri.len(), 20);
     assert_eq!(icosa64.vtx.len(), 12);
     let s64 = format!("{:?}", icosa64.vtx[0]);
@@ -134,20 +39,24 @@ mod tests {
 
   #[test]
   fn test_dodecahedron() {
-    let dodeca32 = Dodecahedron::<f32>::new(1.0f32);
+    let dodeca32_e = Dodecahedron::<f32>::new(1.0f32);
+    let dodeca32 = dodeca32_e.ph;
     assert_eq!(dodeca32.tri.len(), 12); // 12(pentagon) x 3
     assert_eq!(dodeca32.vtx.len(), 20);
-    let dodeca64 = Dodecahedron::<f64>::new(1.0f64);
+    let dodeca64_e = Dodecahedron::<f64>::new(1.0f64);
+    let dodeca64 = dodeca64_e.ph;
     assert_eq!(dodeca64.tri.len(), 12); // 12(pentagon) x 3
     assert_eq!(dodeca64.vtx.len(), 20);
   }
 
   #[test]
   fn test_dodecahedron_center() {
-    let dodeca32_center = DodecahedronCenter::new(1.0f32);
+    let dodeca32_center_e = DodecahedronCenter::new(1.0f32);
+    let dodeca32_center = dodeca32_center_e.ph;
     assert_eq!(dodeca32_center.tri.len(), 12); // 12 x 5
     assert_eq!(dodeca32_center.vtx.len(), 32); // 20 + 12
-    let dodeca64_center = DodecahedronCenter::new(1.0f64);
+    let dodeca64_center_e = DodecahedronCenter::new(1.0f64);
+    let dodeca64_center = dodeca64_center_e.ph;
     assert_eq!(dodeca64_center.tri.len(), 12); // 12 x 5
     assert_eq!(dodeca64_center.vtx.len(), 32); // 20 + 12
 
@@ -171,20 +80,24 @@ mod tests {
 
   #[test]
   fn test_fullerene() {
-    let c60_32 = C60::<f32>::new(1.0f32);
+    let c60_32_e = C60::<f32>::new(1.0f32);
+    let c60_32 = c60_32_e.ph;
     assert_eq!(c60_32.tri.len(), 32); // 12(pentagon) x 3 + 20(hexagon) x 4
     assert_eq!(c60_32.vtx.len(), 60);
-    let c60_64 = C60::<f64>::new(1.0f64);
+    let c60_64_e = C60::<f64>::new(1.0f64);
+    let c60_64 = c60_64_e.ph;
     assert_eq!(c60_64.tri.len(), 32); // 12(pentagon) x 3 + 20(hexagon) x 4
     assert_eq!(c60_64.vtx.len(), 60);
   }
 
   #[test]
   fn test_fullerene_center() {
-    let c60_32_center = C60Center::new(1.0f32);
+    let c60_32_center_e = C60Center::new(1.0f32);
+    let c60_32_center = c60_32_center_e.ph;
     assert_eq!(c60_32_center.tri.len(), 32); // 12 x 5 + 20 x 6
     assert_eq!(c60_32_center.vtx.len(), 92); // 60 + 32
-    let c60_64_center = C60Center::new(1.0f64);
+    let c60_64_center_e = C60Center::new(1.0f64);
+    let c60_64_center = c60_64_center_e.ph;
     assert_eq!(c60_64_center.tri.len(), 32); // 12 x 5 + 20 x 6
     assert_eq!(c60_64_center.vtx.len(), 92); // 60 + 32
   }

@@ -9,32 +9,15 @@
 // use num::{Float, zero, one};
 use num::Float;
 
-use crate::{PHF, TUV};
+use ph_faces::Polyhedron;
 
 /// Icosahedron
 #[derive(Debug)]
 pub struct Icosahedron<F: Float> {
-  /// vtx
-  pub vtx: Vec<[F; 3]>,
+  /// polyhedron tri: Vec 20 of Vec 1 indexed triangles
+  pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 5])>,
-  /// tri: Vec 20 of Vec 1 indexed triangles
-  pub tri: Vec<Vec<[u8; 3]>>
-}
-
-/// impl trait TUV for Icosahedron
-impl<F: Float> TUV<F> for Icosahedron<F> {
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
-    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
-  }
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, false) }
+  pub edges: Vec<(u8, [u8; 5])>
 }
 
 /// Icosahedron
@@ -49,25 +32,11 @@ impl<F: Float> Icosahedron<F> {
     let p = (r5 + i) / d; // golden ratio
 */
     let p = <F>::from((5.0.sqrt() + 1.0) / 2.0).unwrap() * r; // golden ratio
-    Icosahedron{
+    let ph = Polyhedron{
     vtx: vec![
       [o, -i, -p], [o, i, -p], [o, i, p], [o, -i, p],
       [-p, o, -i], [-p, o, i], [p, o, i], [p, o, -i],
       [-i, -p, o], [i, -p, o], [i, p, o], [-i, p, o]
-    ],
-    edges: vec![ // (duplex)
-      (0, [1, 7, 9, 8, 4]), // 6 2 11 8 9 (x = 0) 6 + 8 9 9 1 9
-      (4, [5, 11, 1, 0, 8]), // (y = 0)
-      (8, [9, 3, 5, 4, 0]), // (z = 0)
-      (9, [8, 0, 7, 6, 3]), // (z = 0)
-      (7, [6, 9, 0, 1, 10]), // (y = 0)
-      (1, [0, 4, 11, 10, 7]), // 4 7 11 9 5 (x = 0) 4 + 3 4 10 8 11
-      (11, [10, 1, 4, 5, 2]), // (z = 0)
-      (5, [4, 8, 3, 2, 11]), // (y = 0)
-      (3, [2, 5, 8, 9, 6]), // 3 3 1 9 8 (x = 0) 3 + 0 10 8 11 7
-      (6, [7, 10, 2, 3, 9]), // (y = 0)
-      (10, [11, 2, 6, 7, 1]), // (z = 0)
-      (2, [3, 6, 10, 11, 5]) // 3 4 1 6 10 (x = 0) 3 + 1 9 5 4 5
     ],
     tri: vec![
 /*
@@ -103,6 +72,21 @@ impl<F: Float> Icosahedron<F> {
       vec![[2, 3, 6]],
       vec![[2, 6, 10]]
     ]
-    }
+    };
+    let edges = vec![ // (duplex)
+      (0, [1, 7, 9, 8, 4]), // 6 2 11 8 9 (x = 0) 6 + 8 9 9 1 9
+      (4, [5, 11, 1, 0, 8]), // (y = 0)
+      (8, [9, 3, 5, 4, 0]), // (z = 0)
+      (9, [8, 0, 7, 6, 3]), // (z = 0)
+      (7, [6, 9, 0, 1, 10]), // (y = 0)
+      (1, [0, 4, 11, 10, 7]), // 4 7 11 9 5 (x = 0) 4 + 3 4 10 8 11
+      (11, [10, 1, 4, 5, 2]), // (z = 0)
+      (5, [4, 8, 3, 2, 11]), // (y = 0)
+      (3, [2, 5, 8, 9, 6]), // 3 3 1 9 8 (x = 0) 3 + 0 10 8 11 7
+      (6, [7, 10, 2, 3, 9]), // (y = 0)
+      (10, [11, 2, 6, 7, 1]), // (z = 0)
+      (2, [3, 6, 10, 11, 5]) // 3 4 1 6 10 (x = 0) 3 + 1 9 5 4 5
+    ];
+    Icosahedron{ph, edges}
   }
 }

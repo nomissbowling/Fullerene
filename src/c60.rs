@@ -8,42 +8,27 @@
 
 use num::Float;
 
-use crate::{PHF, TUV, center_indexed, divide_int};
+use ph_faces::{Polyhedron, center_indexed, divide_int};
+
 use crate::icosahedron::Icosahedron;
 
 /// C60
 #[derive(Debug)]
 pub struct C60<F: Float> {
-  /// vtx
-  pub vtx: Vec<[F; 3]>,
+  /// polyhedron tri: (Vec 12 of Vec 3) or (Vec 20 of Vec 4) indexed triangles
+  pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>,
-  /// tri: (Vec 12 of Vec 3) or (Vec 20 of Vec 4) indexed triangles
-  pub tri: Vec<Vec<[u8; 3]>>
-}
-
-/// impl trait TUV for C60
-impl<F: Float> TUV<F> for C60<F> {
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
-    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
-  }
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, false) }
+  pub edges: Vec<(u8, [u8; 3])>
 }
 
 /// C60
 impl<F: Float> C60<F> {
   /// construct
   pub fn new(r: F) -> Self {
-    let icosa = Icosahedron::<F>::new(r);
+    let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
+    let icosa = icosa_e.ph;
     let iv = &icosa.vtx;
-    let vtx: Vec<_> = icosa.edges.iter().flat_map(|&(e, is)|
+    let vtx: Vec<_> = icosa_e.edges.iter().flat_map(|&(e, is)|
       is.iter().map(move |&i|
         divide_int(&iv[e as usize], &iv[i as usize], 1, 2)
       ).collect::<Vec<_>>()
@@ -94,46 +79,31 @@ impl<F: Float> C60<F> {
       [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5]
     ]));
 */
-    C60{vtx, edges, tri}
+    C60{ph: Polyhedron{vtx, tri}, edges}
   }
 }
 
 /// C60 with center
 #[derive(Debug)]
 pub struct C60Center<F: Float> {
-  /// vtx
-  pub vtx: Vec<[F; 3]>,
+  /// polyhedron tri: (Vec 12 of Vec 5) or (Vec 20 of Vec 6) indexed triangles
+  pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>,
-  /// tri: (Vec 12 of Vec 5) or (Vec 20 of Vec 6) indexed triangles
-  pub tri: Vec<Vec<[u8; 3]>>
-}
-
-/// impl trait TUV for C60Center
-impl<F: Float> TUV<F> for C60Center<F> {
-  /// get uv from the one texture (f v i: vertex id of expanded polyhedron)
-  fn get_uv_t(&self, _f: usize, _v: usize, _i: usize,
-    _r: f64, _s: f64, o: [f64; 2]) -> [F; 2] { // rot scale offset
-    [<F>::from(o[0] + 0.0).unwrap(), <F>::from(o[1] + 0.0).unwrap()]
-  }
-  /// ref vtx
-  fn ref_vtx(&self) -> &Vec<[F; 3]> { &self.vtx }
-  /// ref tri
-  fn ref_tri(&self) -> &Vec<Vec<[u8; 3]>> { &self.tri }
-  /// with_uv
-  fn with_uv(&self, tf: bool) -> PHF<F> { self.phf(tf, true) }
+  pub edges: Vec<(u8, [u8; 3])>
 }
 
 /// C60 with center
 impl<F: Float> C60Center<F> {
   /// construct
   pub fn new(r: F) -> Self {
-    let icosa = Icosahedron::<F>::new(r);
+    let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
+    let icosa = icosa_e.ph;
     let iv = &icosa.vtx;
-    let c60 = C60::<F>::new(r);
+    let c60_e = C60::<F>::new(r); // to keep lifetime
+    let c60 = c60_e.ph;
     let cv = &c60.vtx;
     let mut vtx: Vec<_> = cv.iter().map(|&p| p).collect(); // 0-59
-    vtx.extend(icosa.edges.iter().map(|&(e, is)|
+    vtx.extend(icosa_e.edges.iter().map(|&(e, is)|
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 1, 2))); // 60-71
     vtx.extend(icosa.tri.iter().map(|t| center_indexed(&t[0], iv))); // 72-91
     let edges = vec![];
@@ -180,6 +150,6 @@ impl<F: Float> C60Center<F> {
     }));
 */
     // println!("{:?}", tri);
-    C60Center{vtx, edges, tri}
+    C60Center{ph: Polyhedron{vtx, tri}, edges}
   }
 }

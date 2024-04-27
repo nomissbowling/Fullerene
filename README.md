@@ -4,8 +4,18 @@ Fullerene
 Fullerene on the ODE (Open Dynamics Engine) for Rust
 
 
+Links
+-----
+
 - [https://crates.io/crates/Fullerene](https://crates.io/crates/Fullerene)
 - [https://github.com/nomissbowling/Fullerene](https://github.com/nomissbowling/Fullerene)
+
+
+Requirements
+------------
+
+- [https://crates.io/crates/polyhedron-faces](https://crates.io/crates/polyhedron-faces)
+- [https://github.com/nomissbowling/polyhedron-faces](https://github.com/nomissbowling/polyhedron-faces)
 
 
 See also
