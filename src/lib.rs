@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/Fullerene/0.2.1")]
+#![doc(html_root_url = "https://docs.rs/Fullerene/0.2.2")]
 //! Fullerene on the ODE (Open Dynamics Engine) for Rust
 //!
 
