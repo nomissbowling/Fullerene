@@ -44,7 +44,8 @@ impl<F: Float> Dodecahedron<F> {
   vec![[19, 12, 13], [19, 13, 14], [19, 14, 15]], // 10 [19, [12, 13, 14, 15]]
   vec![[19, 15, 16], [19, 16, 17], [19, 17, 18]] // 2 [19, [15, 16, 17, 18]]
     ];
-    Dodecahedron{ph: Polyhedron{vtx, tri}, edges}
+    let uv = vec![];
+    Dodecahedron{ph: Polyhedron{vtx, tri, uv, center: false}, edges}
   }
 }
 
@@ -100,6 +101,7 @@ impl<F: Float> DodecahedronCenter<F> {
     }).collect();
 */
     // println!("{:?}", tri);
-    DodecahedronCenter{ph: Polyhedron{vtx, tri}, edges}
+    let uv = vec![];
+    DodecahedronCenter{ph: Polyhedron{vtx, tri, uv, center: true}, edges}
   }
 }

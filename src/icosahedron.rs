@@ -71,7 +71,9 @@ impl<F: Float> Icosahedron<F> {
       vec![[2, 5, 3]],
       vec![[2, 3, 6]],
       vec![[2, 6, 10]]
-    ]
+    ],
+    uv: vec![],
+    center: false
     };
     let edges = vec![ // (duplex)
       (0, [1, 7, 9, 8, 4]), // 6 2 11 8 9 (x = 0) 6 + 8 9 9 1 9

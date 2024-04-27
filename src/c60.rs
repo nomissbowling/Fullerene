@@ -79,7 +79,8 @@ impl<F: Float> C60<F> {
       [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5]
     ]));
 */
-    C60{ph: Polyhedron{vtx, tri}, edges}
+    let uv = vec![];
+    C60{ph: Polyhedron{vtx, tri, uv, center: false}, edges}
   }
 }
 
@@ -150,6 +151,7 @@ impl<F: Float> C60Center<F> {
     }));
 */
     // println!("{:?}", tri);
-    C60Center{ph: Polyhedron{vtx, tri}, edges}
+    let uv = vec![];
+    C60Center{ph: Polyhedron{vtx, tri, uv, center: true}, edges}
   }
 }
