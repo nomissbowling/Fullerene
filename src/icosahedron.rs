@@ -17,7 +17,7 @@ pub struct Icosahedron<F: Float> {
   /// polyhedron tri: Vec 20 of Vec 1 indexed triangles
   pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 5])>
+  pub edges: Vec<(u16, [u16; 5])>
 }
 
 /// Icosahedron

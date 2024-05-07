@@ -26,6 +26,9 @@ See also
 - [dxlib (DxLib for Rust)](https://crates.io/crates/dxlib)
 - [wgpu-app](https://crates.io/crates/wgpu-app)
 
+- [https://crates.io/crates/plotters-fullerene](https://crates.io/crates/plotters-fullerene)
+- [https://github.com/nomissbowling/plotters-fullerene](https://github.com/nomissbowling/plotters-fullerene)
+
 
 License
 -------

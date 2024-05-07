@@ -18,7 +18,7 @@ pub struct Dodecahedron<F: Float> {
   /// polyhedron tri: Vec 12 of Vec 3 indexed triangles
   pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>
+  pub edges: Vec<(u16, [u16; 3])>
 }
 
 /// Dodecahedron
@@ -55,7 +55,7 @@ pub struct DodecahedronCenter<F: Float> {
   /// polyhedron tri: Vec 12 of Vec 5 indexed triangles
   pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>
+  pub edges: Vec<(u16, [u16; 3])>
 }
 
 /// Dodecahedron with center
@@ -78,8 +78,8 @@ impl<F: Float> DodecahedronCenter<F> {
     vtx.extend(icosa_e.edges.iter().map(|&(e, is)|
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 2, 1))); // 20-31
     let edges = vec![];
-    let tri: Vec<_> = (20..32).into_iter().map(|q: u8| {
-      let mut t = Vec::with_capacity(5); // vec![[0u8; 3]; 5];
+    let tri: Vec<_> = (20..32).into_iter().map(|q: u16| {
+      let mut t = Vec::with_capacity(5); // vec![[0u16; 3]; 5];
       let o = q as usize - 20;
       t.push([q, dodeca.tri[o][0][0], dodeca.tri[o][0][1]]);
       let _: Vec<_> = (0..3).into_iter().map(|p| {
@@ -89,8 +89,8 @@ impl<F: Float> DodecahedronCenter<F> {
       t
     }).collect();
 /*
-    let tri: Vec<_> = (20..32).into_iter().flat_map(|q: u8| {
-      let mut t = Vec::with_capacity(5); // vec![[0u8; 3]; 5];
+    let tri: Vec<_> = (20..32).into_iter().flat_map(|q: u16| {
+      let mut t = Vec::with_capacity(5); // vec![[0u16; 3]; 5];
       let o = (q as usize - 20) * 3;
       t.push([q, dodeca.tri[o][0], dodeca.tri[o][1]]);
       let _: Vec<_> = (0..3).into_iter().map(|p| {

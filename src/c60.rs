@@ -18,7 +18,7 @@ pub struct C60<F: Float> {
   /// polyhedron tri: (Vec 12 of Vec 3) or (Vec 20 of Vec 4) indexed triangles
   pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>
+  pub edges: Vec<(u16, [u16; 3])>
 }
 
 /// C60
@@ -56,7 +56,7 @@ impl<F: Float> C60<F> {
       [48, 47, 56, 55, 40, 44], // 18
       [52, 51, 57, 56, 47, 46] // 19
     ];
-    let mut tri: Vec<_> = (0..12).into_iter().map(|q: u8| {
+    let mut tri: Vec<_> = (0..12).into_iter().map(|q: u16| {
       let o = q * 5;
       vec![[o, o + 1, o + 2], [o, o + 2, o + 3], [o, o + 3, o + 4]]
     }).collect();
@@ -65,7 +65,7 @@ impl<F: Float> C60<F> {
       [h[0], h[3], h[4]], [h[0], h[4], h[5]]
     ]));
 /*
-    let mut tri: Vec<_> = (0..12).into_iter().flat_map(|q: u8| {
+    let mut tri: Vec<_> = (0..12).into_iter().flat_map(|q: u16| {
       let o = q * 5;
       vec![[o, o + 1, o + 2], [o, o + 2, o + 3], [o, o + 3, o + 4]]
     }).collect();
@@ -75,7 +75,7 @@ impl<F: Float> C60<F> {
     ]));
 */
 /*
-    tri.extend((12..32).into_iter().flat_map(|q: u8| vec![
+    tri.extend((12..32).into_iter().flat_map(|q: u16| vec![
       [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5]
     ]));
 */
@@ -90,7 +90,7 @@ pub struct C60Center<F: Float> {
   /// polyhedron tri: (Vec 12 of Vec 5) or (Vec 20 of Vec 6) indexed triangles
   pub ph: Polyhedron<F>,
   /// edges (duplex)
-  pub edges: Vec<(u8, [u8; 3])>
+  pub edges: Vec<(u16, [u16; 3])>
 }
 
 /// C60 with center
@@ -108,8 +108,8 @@ impl<F: Float> C60Center<F> {
       divide_int(&iv[e as usize], &center_indexed(&is, &iv), 1, 2))); // 60-71
     vtx.extend(icosa.tri.iter().map(|t| center_indexed(&t[0], iv))); // 72-91
     let edges = vec![];
-    let mut tri: Vec<_> = (60..72).into_iter().map(|q: u8| {
-      let mut t = Vec::with_capacity(5); // vec![[0u8; 3]; 5];
+    let mut tri: Vec<_> = (60..72).into_iter().map(|q: u16| {
+      let mut t = Vec::with_capacity(5); // vec![[0u16; 3]; 5];
       let o = q as usize - 60;
       t.push([q, c60.tri[o][0][0], c60.tri[o][0][1]]);
       let _: Vec<_> = (0..3).into_iter().map(|p| {
@@ -118,8 +118,8 @@ impl<F: Float> C60Center<F> {
       t.push([q, c60.tri[o][2][2], c60.tri[o][2][0]]);
       t
     }).collect();
-    tri.extend((72..92).into_iter().map(|q: u8| {
-      let mut t = Vec::with_capacity(6); // vec![[0u8; 3]; 6];
+    tri.extend((72..92).into_iter().map(|q: u16| {
+      let mut t = Vec::with_capacity(6); // vec![[0u16; 3]; 6];
       let o = q as usize - 72 + 12;
       t.push([q, c60.tri[o][0][0], c60.tri[o][0][1]]);
       let _: Vec<_> = (0..4).into_iter().map(|p| {
@@ -129,8 +129,8 @@ impl<F: Float> C60Center<F> {
       t
     }));
 /*
-    let mut tri: Vec<_> = (60..72).into_iter().flat_map(|q: u8| {
-      let mut t = Vec::with_capacity(5); // vec![[0u8; 3]; 5];
+    let mut tri: Vec<_> = (60..72).into_iter().flat_map(|q: u16| {
+      let mut t = Vec::with_capacity(5); // vec![[0u16; 3]; 5];
       let o = (q as usize - 60) * 3;
       t.push([q, c60.tri[o][0], c60.tri[o][1]]);
       let _: Vec<_> = (0..3).into_iter().map(|p| {
@@ -139,8 +139,8 @@ impl<F: Float> C60Center<F> {
       t.push([q, c60.tri[o + 2][2], c60.tri[o + 2][0]]);
       t
     }).collect();
-    tri.extend((72..92).into_iter().flat_map(|q: u8| {
-      let mut t = Vec::with_capacity(6); // vec![[0u8; 3]; 6];
+    tri.extend((72..92).into_iter().flat_map(|q: u16| {
+      let mut t = Vec::with_capacity(6); // vec![[0u16; 3]; 6];
       let o = (q as usize - 72) * 4 + 12 * 3;
       t.push([q, c60.tri[o][0], c60.tri[o][1]]);
       let _: Vec<_> = (0..4).into_iter().map(|p| {
