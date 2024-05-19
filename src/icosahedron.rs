@@ -9,7 +9,7 @@
 // use num::{Float, zero, one};
 use num::Float;
 
-use ph_faces::Polyhedron;
+use ph_faces::{Polyhedron, calc_cg_with_volume};
 
 /// Icosahedron
 #[derive(Debug)]
@@ -21,7 +21,7 @@ pub struct Icosahedron<F: Float> {
 }
 
 /// Icosahedron
-impl<F: Float> Icosahedron<F> {
+impl<F: Float + std::fmt::Debug> Icosahedron<F> where F: std::iter::Sum {
   /// construct
   pub fn new(r: F) -> Self {
     let o = <F>::from(0).unwrap(); // = zero(); // = zero::<F>();
@@ -32,7 +32,7 @@ impl<F: Float> Icosahedron<F> {
     let p = (r5 + i) / d; // golden ratio
 */
     let p = <F>::from((5.0.sqrt() + 1.0) / 2.0).unwrap() * r; // golden ratio
-    let ph = Polyhedron{
+    let mut ph = Polyhedron{
     vtx: vec![
       [o, -i, -p], [o, i, -p], [o, i, p], [o, -i, p],
       [-p, o, -i], [-p, o, i], [p, o, i], [p, o, -i],
@@ -73,8 +73,12 @@ impl<F: Float> Icosahedron<F> {
       vec![[2, 6, 10]]
     ],
     uv: vec![],
+    vol: o,
     center: false
     };
+    let q = <F>::from(1e-6).unwrap();
+    let (_cg, vol) = calc_cg_with_volume(&ph.tri, &ph.vtx, q);
+    ph.vol = vol;
     let edges = vec![ // (duplex)
       (0, [1, 7, 9, 8, 4]), // 6 2 11 8 9 (x = 0) 6 + 8 9 9 1 9
       (4, [5, 11, 1, 0, 8]), // (y = 0)

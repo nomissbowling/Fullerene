@@ -8,7 +8,7 @@
 
 use num::Float;
 
-use ph_faces::{Polyhedron, center_indexed, divide_int};
+use ph_faces::{Polyhedron, center_indexed, divide_int, calc_cg_with_volume};
 
 use crate::icosahedron::Icosahedron;
 
@@ -22,7 +22,7 @@ pub struct C60<F: Float> {
 }
 
 /// C60
-impl<F: Float> C60<F> {
+impl<F: Float + std::fmt::Debug> C60<F> where F: std::iter::Sum {
   /// construct
   pub fn new(r: F) -> Self {
     let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
@@ -80,7 +80,9 @@ impl<F: Float> C60<F> {
     ]));
 */
     let uv = vec![];
-    C60{ph: Polyhedron{vtx, tri, uv, center: false}, edges}
+    let p = <F>::from(1e-6).unwrap();
+    let (_cg, vol) = calc_cg_with_volume(&tri, &vtx, p);
+    C60{ph: Polyhedron{vtx, tri, uv, vol, center: false}, edges}
   }
 }
 
@@ -94,7 +96,7 @@ pub struct C60Center<F: Float> {
 }
 
 /// C60 with center
-impl<F: Float> C60Center<F> {
+impl<F: Float + std::fmt::Debug> C60Center<F> where F: std::iter::Sum {
   /// construct
   pub fn new(r: F) -> Self {
     let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
@@ -152,6 +154,8 @@ impl<F: Float> C60Center<F> {
 */
     // println!("{:?}", tri);
     let uv = vec![];
-    C60Center{ph: Polyhedron{vtx, tri, uv, center: true}, edges}
+    let p = <F>::from(1e-6).unwrap();
+    let (_cg, vol) = calc_cg_with_volume(&tri, &vtx, p);
+    C60Center{ph: Polyhedron{vtx, tri, uv, vol, center: true}, edges}
   }
 }

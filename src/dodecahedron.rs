@@ -8,7 +8,7 @@
 
 use num::Float;
 
-use ph_faces::{Polyhedron, center_indexed, divide_int};
+use ph_faces::{Polyhedron, center_indexed, divide_int, calc_cg_with_volume};
 
 use crate::icosahedron::Icosahedron;
 
@@ -22,7 +22,7 @@ pub struct Dodecahedron<F: Float> {
 }
 
 /// Dodecahedron
-impl<F: Float> Dodecahedron<F> {
+impl<F: Float + std::fmt::Debug> Dodecahedron<F> where F: std::iter::Sum {
   /// construct
   pub fn new(r: F) -> Self {
     let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
@@ -45,7 +45,9 @@ impl<F: Float> Dodecahedron<F> {
   vec![[19, 15, 16], [19, 16, 17], [19, 17, 18]] // 2 [19, [15, 16, 17, 18]]
     ];
     let uv = vec![];
-    Dodecahedron{ph: Polyhedron{vtx, tri, uv, center: false}, edges}
+    let p = <F>::from(1e-6).unwrap();
+    let (_cg, vol) = calc_cg_with_volume(&tri, &vtx, p);
+    Dodecahedron{ph: Polyhedron{vtx, tri, uv, vol, center: false}, edges}
   }
 }
 
@@ -59,7 +61,7 @@ pub struct DodecahedronCenter<F: Float> {
 }
 
 /// Dodecahedron with center
-impl<F: Float> DodecahedronCenter<F> {
+impl<F: Float + std::fmt::Debug> DodecahedronCenter<F> where F: std::iter::Sum {
   /// construct
   pub fn new(r: F) -> Self {
     let icosa_e = Icosahedron::<F>::new(r); // to keep lifetime
@@ -102,6 +104,8 @@ impl<F: Float> DodecahedronCenter<F> {
 */
     // println!("{:?}", tri);
     let uv = vec![];
-    DodecahedronCenter{ph: Polyhedron{vtx, tri, uv, center: true}, edges}
+    let p = <F>::from(1e-6).unwrap();
+    let (_cg, vol) = calc_cg_with_volume(&tri, &vtx, p);
+    DodecahedronCenter{ph: Polyhedron{vtx, tri, uv, vol, center: true}, edges}
   }
 }

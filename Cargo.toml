@@ -1,6 +1,6 @@
 [package]
 name = "Fullerene"
-version = "0.3.1" # change with html_root_url in lib.rs
+version = "0.4.1" # change with html_root_url in lib.rs
 edition = "2021"
 authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
 
@@ -23,4 +23,4 @@ name = "fullerene"
 [dependencies]
 num = { version = "0.4" } # "0.4.1"
 
-polyhedron-faces = { version = "0.3" }
+polyhedron-faces = { version = "0.4" }
